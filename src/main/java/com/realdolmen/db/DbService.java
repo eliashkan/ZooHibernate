@@ -9,12 +9,11 @@ import javax.persistence.Persistence;
 
 public class DbService {
 
-    private static DbService instance;
-
     private static final EntityManagerFactory entityManagerFactory =
             Persistence.createEntityManagerFactory("zooPu");
-    private static EntityManager entityManager;
     private static final Logger logger = LoggerFactory.getLogger(DbService.class);
+    private static DbService instance;
+    private static EntityManager entityManager;
 
     private DbService() {
     }
@@ -33,6 +32,6 @@ public class DbService {
         if (instance == null) {
             instance = new DbService();
         }
-        
+        return instance;
     }
 }
