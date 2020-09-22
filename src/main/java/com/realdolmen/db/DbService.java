@@ -9,29 +9,42 @@ import javax.persistence.Persistence;
 
 public class DbService {
 
-    private static final EntityManagerFactory entityManagerFactory =
-            Persistence.createEntityManagerFactory("zooPu");
     private static final Logger logger = LoggerFactory.getLogger(DbService.class);
-    private static DbService instance;
-    private static EntityManager entityManager;
+    private static EntityManagerFactory entityManagerFactory = null;
+    private static EntityManager entityManager = null;
 
-    private DbService() {
+    private static String persistenceUnitName;
+
+    public static String setPersistenceUnitName(String persistenceUnitName) {
+        DbService.persistenceUnitName = persistenceUnitName;
+        return persistenceUnitName;
     }
 
-    private static EntityManager getEntityManager() {
+    public static EntityManager getEntityManager() {
+        if (entityManagerFactory != null && entityManagerFactory.isOpen()) {
+            entityManagerFactory.close();
+            logger.info("Closing EntityManagerFactory");
+        }
+        logger.info("Creating EntityManagerFactory");
+        entityManagerFactory =
+                Persistence.createEntityManagerFactory(persistenceUnitName);
+
         if (entityManager != null && entityManager.isOpen()) {
             entityManager.close();
             logger.info("Closing EntityManager");
         }
         logger.info("Creating EntityManager");
-        entityManager = entityManagerFactory.createEntityManager();
+        entityManager = DbService.entityManagerFactory.createEntityManager();
+
         return entityManager;
     }
 
-    public static DbService getInstance() {
-        if (instance == null) {
-            instance = new DbService();
-        }
-        return instance;
-    }
+//      Not necessary to apply the singleton pattern: all variables and methods are already static
+//      so 'new DbService' will never create more than one instance of the fields
+//    public static DbService getInstance() {
+//        if (instance == null) {
+//            instance = new DbService();
+//        }
+//        return instance;
+//    }
 }
